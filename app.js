@@ -1,114 +1,58 @@
-const setup = document.querySelector("#setup");
-const game = document.querySelector("#game");
-const createTab = document.querySelector("#createTab");
-const joinTab = document.querySelector("#joinTab");
-const createForm = document.querySelector("#createForm");
-const joinForm = document.querySelector("#joinForm");
-const createName = document.querySelector("#createName");
-const joinName = document.querySelector("#joinName");
-const joinCode = document.querySelector("#joinCode");
-const toast = document.querySelector("#toast");
-const roomCode = document.querySelector("#copyCode");
-const roundLabel = document.querySelector("#roundLabel");
-const lobby = document.querySelector("#lobby");
-const playing = document.querySelector("#playing");
-const results = document.querySelector("#results");
-const finished = document.querySelector("#finished");
-const playersLobby = document.querySelector("#playersLobby");
-const livePlayers = document.querySelector("#livePlayers");
-const startButton = document.querySelector("#startButton");
-const nextButton = document.querySelector("#nextButton");
-const newGame = document.querySelector("#newGame");
-const promptText = document.querySelector("#promptText");
-const answerForm = document.querySelector("#answerForm");
-const answerInput = document.querySelector("#answerInput");
-const answerHint = document.querySelector("#answerHint");
-const timerText = document.querySelector("#timerText");
-const timerFill = document.querySelector("#timerFill");
-const ranking = document.querySelector("#ranking");
-const finalRanking = document.querySelector("#finalRanking");
-const winnerText = document.querySelector("#winnerText");
+const prompts = [
+  ["un frutto", "B"],
+  ["un animale", "C"],
+  ["una citta", "M"],
+  ["un cibo", "P"],
+  ["uno sport", "T"],
+  ["un colore", "R"],
+  ["un oggetto", "S"],
+  ["un mestiere", "D"],
+  ["qualcosa in cucina", "F"],
+  ["una parola da spiaggia", "O"],
+];
 
-let state = {
-  code: localStorage.getItem("fuo_room_code") || "",
-  playerId: localStorage.getItem("fuo_player_id") || "",
-  room: null,
-  poll: null,
+const state = {
+  code: "",
+  round: 0,
+  prompt: null,
+  startedAt: 0,
+  timer: null,
+  players: [],
 };
 
-function showToast(message) {
-  toast.textContent = message;
-  toast.classList.remove("hidden");
-  window.clearTimeout(showToast.timer);
-  showToast.timer = window.setTimeout(() => toast.classList.add("hidden"), 2600);
-}
+const views = {
+  setup: document.querySelector("#setup"),
+  lobby: document.querySelector("#lobby"),
+  round: document.querySelector("#round"),
+  results: document.querySelector("#results"),
+  winner: document.querySelector("#winner"),
+};
 
-async function api(path, options = {}) {
-  const response = await fetch(path, {
-    headers: { "Content-Type": "application/json" },
-    ...options,
+const hostName = document.querySelector("#hostName");
+const createRoom = document.querySelector("#createRoom");
+const roomCode = document.querySelector("#roomCode");
+const addPlayerForm = document.querySelector("#addPlayerForm");
+const playerName = document.querySelector("#playerName");
+const lobbyPlayers = document.querySelector("#lobbyPlayers");
+const startGame = document.querySelector("#startGame");
+const roundNumber = document.querySelector("#roundNumber");
+const promptText = document.querySelector("#prompt");
+const clock = document.querySelector("#clock");
+const answerBoard = document.querySelector("#answerBoard");
+const ranking = document.querySelector("#ranking");
+const nextRound = document.querySelector("#nextRound");
+const winnerText = document.querySelector("#winnerText");
+const resetGame = document.querySelector("#resetGame");
+
+function show(view) {
+  Object.entries(views).forEach(([name, element]) => {
+    element.classList.toggle("hidden", name !== view);
   });
-  const data = await response.json();
-  if (!response.ok) {
-    const error = new Error(data.error || "Errore");
-    error.data = data;
-    throw error;
-  }
-  return data;
 }
 
-function setSession(playerId, room) {
-  state.playerId = playerId;
-  state.code = room.code;
-  state.room = room;
-  localStorage.setItem("fuo_player_id", playerId);
-  localStorage.setItem("fuo_room_code", room.code);
-  setup.classList.add("hidden");
-  game.classList.remove("hidden");
-  render();
-  startPolling();
-}
-
-function startPolling() {
-  window.clearInterval(state.poll);
-  state.poll = window.setInterval(fetchRoom, 900);
-  fetchRoom();
-}
-
-async function fetchRoom() {
-  if (!state.code) return;
-  try {
-    const data = await api(`/api/room/${state.code}`);
-    state.room = data.room;
-    render();
-  } catch (error) {
-    if (error.message.includes("non trovata")) {
-      window.clearInterval(state.poll);
-      localStorage.removeItem("fuo_player_id");
-      localStorage.removeItem("fuo_room_code");
-    }
-  }
-}
-
-function currentPlayer() {
-  return state.room?.players.find((player) => player.id === state.playerId);
-}
-
-function isHost() {
-  return state.room?.hostId === state.playerId;
-}
-
-function formatMs(ms) {
-  if (!Number.isFinite(ms)) return "nessuna risposta";
-  return `${(ms / 1000).toFixed(2)}s`;
-}
-
-function playerCard(player) {
-  const status = player.active ? (player.answer?.accepted ? "risposto" : "in gioco") : "fuori";
-  return `<article class="player ${player.active ? "" : "is-out"}">
-    <span>${escapeHtml(player.name)}</span>
-    <small>${status}</small>
-  </article>`;
+function makeCode() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  return Array.from({ length: 5 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
 }
 
 function escapeHtml(value) {
@@ -120,184 +64,143 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function render() {
-  const room = state.room;
-  if (!room) return;
-
-  roomCode.textContent = room.code;
-  roundLabel.textContent = room.round;
-  lobby.classList.toggle("hidden", room.status !== "lobby");
-  playing.classList.toggle("hidden", room.status !== "playing");
-  results.classList.toggle("hidden", room.status !== "results");
-  finished.classList.toggle("hidden", room.status !== "finished");
-  startButton.classList.toggle("hidden", !isHost());
-  nextButton.classList.toggle("hidden", !isHost());
-
-  const activeCount = room.players.filter((player) => player.active).length;
-  startButton.disabled = activeCount < 2;
-  playersLobby.innerHTML = room.players.map(playerCard).join("");
-  livePlayers.innerHTML = room.players.map(playerCard).join("");
-
-  if (room.status === "playing") {
-    const prompt = room.prompt;
-    promptText.textContent = `${prompt.category} con la ${prompt.letter}`;
-    updateTimer();
-    const me = currentPlayer();
-    const canAnswer = me?.active && !me?.answer?.accepted;
-    answerInput.disabled = !canAnswer;
-    answerForm.querySelector("button").disabled = !canAnswer;
-    answerHint.textContent = me?.answer?.accepted
-      ? `Risposta inviata in ${formatMs(me.answer.elapsedMs)}.`
-      : me?.active
-        ? "Conta solo la velocita: appena invii una risposta valida, il cronometro si ferma."
-        : "Sei stato eliminato, puoi seguire il round.";
-    if (canAnswer) answerInput.focus();
-  }
-
-  if (room.status === "results") {
-    renderRanking(room, ranking);
-  }
-
-  if (room.status === "finished") {
-    const winner = room.players.find((player) => player.id === room.winnerId);
-    winnerText.textContent = winner ? `Ha vinto ${winner.name}!` : "Partita finita";
-    renderRanking(room, finalRanking);
-  }
+function normalize(value) {
+  return String(value)
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
 }
 
-function updateTimer() {
-  const room = state.room;
-  if (!room || room.status !== "playing") return;
-  const elapsed = Date.now() - room.roundStartedAt;
-  const remaining = Math.max(0, room.roundTimeLimit - elapsed);
-  const pct = Math.max(0, remaining / room.roundTimeLimit);
-  timerText.textContent = (remaining / 1000).toFixed(1);
-  timerFill.style.transform = `scaleX(${pct})`;
-}
-
-function renderRanking(room, target) {
-  const sorted = [...room.players]
-    .filter((player) => player.active || player.id === room.eliminatedThisRound)
-    .sort((a, b) => {
-      const aMs = a.answer?.accepted ? a.answer.elapsedMs : Number.POSITIVE_INFINITY;
-      const bMs = b.answer?.accepted ? b.answer.elapsedMs : Number.POSITIVE_INFINITY;
-      if (aMs !== bMs) return bMs - aMs;
-      return a.joinedAt - b.joinedAt;
-    });
-
-  target.innerHTML = sorted
-    .map((player, index) => {
-      const eliminated = player.id === room.eliminatedThisRound;
-      const answer = player.answer?.text ? `"${escapeHtml(player.answer.text)}"` : "nessuna risposta";
-      return `<li class="rank ${eliminated ? "is-eliminated" : ""}">
-        <span class="rank__pos">${index + 1}</span>
-        <div>
-          <strong>${escapeHtml(player.name)}${eliminated ? " - eliminato" : ""}</strong>
-          <div class="rank__answer">${answer}</div>
-        </div>
-        <time>${formatMs(player.answer?.accepted ? player.answer.elapsedMs : Infinity)}</time>
-      </li>`;
-    })
+function renderLobby() {
+  roomCode.textContent = state.code;
+  startGame.disabled = state.players.filter((player) => player.active).length < 2;
+  lobbyPlayers.innerHTML = state.players
+    .map((player) => `<article class="player"><strong>${escapeHtml(player.name)}</strong><span>${player.active ? "in gioco" : "fuori"}</span></article>`)
     .join("");
 }
 
-createTab.addEventListener("click", () => {
-  createTab.classList.add("is-active");
-  joinTab.classList.remove("is-active");
-  createForm.classList.remove("hidden");
-  joinForm.classList.add("hidden");
-});
+function addPlayer(name) {
+  const clean = String(name || "").trim().slice(0, 20);
+  if (!clean) return;
+  state.players.push({
+    id: crypto.randomUUID(),
+    name: clean,
+    active: true,
+    answer: "",
+    elapsed: null,
+  });
+}
 
-joinTab.addEventListener("click", () => {
-  joinTab.classList.add("is-active");
-  createTab.classList.remove("is-active");
-  joinForm.classList.remove("hidden");
-  createForm.classList.add("hidden");
-});
+function startRound() {
+  const active = state.players.filter((player) => player.active);
+  if (active.length < 2) return;
 
-createForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  try {
-    const data = await api("/api/create", {
-      method: "POST",
-      body: JSON.stringify({ name: createName.value }),
-    });
-    setSession(data.playerId, data.room);
-    showToast("Stanza creata. Condividi il codice.");
-  } catch (error) {
-    showToast(error.message);
+  state.round += 1;
+  state.prompt = prompts[(state.round - 1) % prompts.length];
+  state.startedAt = performance.now();
+  state.players.forEach((player) => {
+    player.answer = "";
+    player.elapsed = null;
+  });
+
+  roundNumber.textContent = `round ${state.round}`;
+  promptText.textContent = `${state.prompt[0]} con la ${state.prompt[1]}`;
+  answerBoard.innerHTML = active
+    .map((player) => `<form class="answer" data-id="${player.id}">
+      <strong>${escapeHtml(player.name)}</strong>
+      <input maxlength="40" autocomplete="off" placeholder="Risposta" />
+      <button type="submit">Invia</button>
+    </form>`)
+    .join("");
+
+  window.clearInterval(state.timer);
+  state.timer = window.setInterval(() => {
+    clock.textContent = `${((performance.now() - state.startedAt) / 1000).toFixed(1)}s`;
+  }, 100);
+
+  show("round");
+}
+
+function submitAnswer(form) {
+  const player = state.players.find((item) => item.id === form.dataset.id);
+  const input = form.querySelector("input");
+  const button = form.querySelector("button");
+  const answer = input.value.trim();
+  if (!player || player.elapsed !== null) return;
+  if (!normalize(answer).startsWith(state.prompt[1].toLowerCase())) {
+    input.value = "";
+    input.placeholder = `Deve iniziare con ${state.prompt[1]}`;
+    input.focus();
+    return;
   }
-});
 
-joinForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  try {
-    const data = await api("/api/join", {
-      method: "POST",
-      body: JSON.stringify({ name: joinName.value, code: joinCode.value }),
-    });
-    setSession(data.playerId, data.room);
-    showToast("Sei dentro.");
-  } catch (error) {
-    showToast(error.message);
+  player.answer = answer;
+  player.elapsed = performance.now() - state.startedAt;
+  input.disabled = true;
+  button.disabled = true;
+  button.textContent = `${(player.elapsed / 1000).toFixed(2)}s`;
+
+  const active = state.players.filter((item) => item.active);
+  if (active.every((item) => item.elapsed !== null)) {
+    finishRound();
   }
-});
+}
 
-startButton.addEventListener("click", async () => {
-  try {
-    const data = await api("/api/start", {
-      method: "POST",
-      body: JSON.stringify({ code: state.code, playerId: state.playerId }),
-    });
-    state.room = data.room;
-    render();
-  } catch (error) {
-    showToast(error.message);
+function finishRound() {
+  window.clearInterval(state.timer);
+
+  const active = state.players.filter((player) => player.active);
+  const ordered = [...active].sort((a, b) => b.elapsed - a.elapsed);
+  const eliminated = ordered[0];
+  if (eliminated && active.length > 1) eliminated.active = false;
+
+  ranking.innerHTML = ordered
+    .map((player, index) => `<li class="rank ${player.id === eliminated.id ? "is-out" : ""}">
+      <span class="badge">${index + 1}</span>
+      <div>
+        <strong>${escapeHtml(player.name)}${player.id === eliminated.id ? " - eliminato" : ""}</strong>
+        <div>${escapeHtml(player.answer)}</div>
+      </div>
+      <time>${(player.elapsed / 1000).toFixed(2)}s</time>
+    </li>`)
+    .join("");
+
+  const remaining = state.players.filter((player) => player.active);
+  if (remaining.length <= 1) {
+    winnerText.textContent = remaining[0] ? `Ha vinto ${remaining[0].name}!` : "Partita finita";
+    show("winner");
+    return;
   }
-});
 
-nextButton.addEventListener("click", () => startButton.click());
+  show("results");
+}
 
-answerForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  try {
-    const data = await api("/api/answer", {
-      method: "POST",
-      body: JSON.stringify({ code: state.code, playerId: state.playerId, answer: answerInput.value }),
-    });
-    answerInput.value = "";
-    state.room = data.room;
-    render();
-  } catch (error) {
-    if (error.data?.room) state.room = error.data.room;
-    showToast(error.message);
-    render();
-  }
+createRoom.addEventListener("click", () => {
+  state.code = makeCode();
+  state.round = 0;
+  state.players = [];
+  addPlayer(hostName.value);
+  renderLobby();
+  show("lobby");
 });
 
 roomCode.addEventListener("click", async () => {
-  try {
-    await navigator.clipboard.writeText(state.code);
-    showToast("Codice copiato.");
-  } catch {
-    showToast(`Codice: ${state.code}`);
-  }
+  await navigator.clipboard?.writeText(state.code).catch(() => {});
 });
 
-newGame.addEventListener("click", () => {
-  localStorage.removeItem("fuo_player_id");
-  localStorage.removeItem("fuo_room_code");
-  window.location.reload();
+addPlayerForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  addPlayer(playerName.value);
+  playerName.value = "";
+  renderLobby();
 });
 
-joinCode.addEventListener("input", () => {
-  joinCode.value = joinCode.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 5);
+startGame.addEventListener("click", startRound);
+nextRound.addEventListener("click", startRound);
+resetGame.addEventListener("click", () => window.location.reload());
+
+answerBoard.addEventListener("submit", (event) => {
+  event.preventDefault();
+  submitAnswer(event.target);
 });
-
-window.setInterval(updateTimer, 100);
-
-if (state.code && state.playerId) {
-  setup.classList.add("hidden");
-  game.classList.remove("hidden");
-  startPolling();
-}
