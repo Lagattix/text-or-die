@@ -1,0 +1,18 @@
+{
+  "name": "party-word-race",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Party game multiplayer: rispondi veloce al prompt, il piu lento viene eliminato.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check public/app.js"
+  },
+  "keywords": [
+    "party-game",
+    "multiplayer",
+    "word-game"
+  ],
+  "author": "",
+  "license": "MIT"
+}
