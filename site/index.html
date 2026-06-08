@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Text or Die</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="hero">
+        <div class="hero__mark">
+          <span>T</span>
+          <span>?</span>
+          <span>OK</span>
+        </div>
+        <div>
+          <p class="eyebrow">party game</p>
+          <h1>Text or Die</h1>
+          <p class="subtitle">Una categoria, una lettera, una risposta veloce. Il piu lento viene eliminato.</p>
+        </div>
+      </header>
+
+      <section id="setup" class="panel">
+        <div class="grid two">
+          <label>
+            Nome host
+            <input id="hostName" maxlength="20" value="Giuseppe" />
+          </label>
+          <button id="createRoom" type="button">Crea stanza</button>
+        </div>
+      </section>
+
+      <section id="lobby" class="panel hidden">
+        <div class="top">
+          <div>
+            <p class="eyebrow">codice stanza</p>
+            <button id="roomCode" class="code" type="button">-----</button>
+          </div>
+          <button id="startGame" type="button">Inizia</button>
+        </div>
+        <form id="addPlayerForm" class="grid two">
+          <label>
+            Aggiungi giocatore
+            <input id="playerName" maxlength="20" placeholder="Nome" />
+          </label>
+          <button type="submit">Aggiungi</button>
+        </form>
+        <div id="lobbyPlayers" class="players"></div>
+      </section>
+
+      <section id="round" class="panel hidden">
+        <div class="round-head">
+          <div>
+            <p id="roundNumber" class="eyebrow">round 1</p>
+            <h2 id="prompt">un frutto con la B</h2>
+          </div>
+          <div class="clock">
+            <strong id="clock">0.0s</strong>
+          </div>
+        </div>
+        <div id="answerBoard" class="answer-board"></div>
+      </section>
+
+      <section id="results" class="panel hidden">
+        <div class="top">
+          <div>
+            <p class="eyebrow">classifica</p>
+            <h2>Dal piu lento al piu veloce</h2>
+          </div>
+          <button id="nextRound" type="button">Prossimo round</button>
+        </div>
+        <ol id="ranking" class="ranking"></ol>
+      </section>
+
+      <section id="winner" class="panel hidden">
+        <p class="eyebrow">vittoria</p>
+        <h2 id="winnerText">Ha vinto!</h2>
+        <button id="resetGame" type="button">Nuova partita</button>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
