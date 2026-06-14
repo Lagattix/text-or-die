@@ -101,6 +101,109 @@ const prompts = [
   ["un lavoro creativo", "P"],
 ];
 
+const answerBank = {
+  "un frutto|B": ["banana", "bergamotto", "bacca", "babaco"],
+  "un animale|C": ["cane", "cavallo", "capra", "coniglio", "cervo", "coccodrillo"],
+  "una citta|M": ["milano", "madrid", "monza", "modena", "messina", "mantova"],
+  "un cibo|P": ["pizza", "pasta", "pane", "pollo", "patate", "polenta"],
+  "uno sport|T": ["tennis", "taekwondo", "triathlon", "tuffi", "trekking"],
+  "un colore|R": ["rosso", "rosa", "rame", "rubino"],
+  "un oggetto|S": ["sedia", "scarpa", "specchio", "sapone", "spazzola"],
+  "un mestiere|D": ["dottore", "dentista", "designer", "direttore", "domatore"],
+  "qualcosa in cucina|F": ["forchetta", "frigorifero", "forno", "frullatore", "fornello"],
+  "una parola da spiaggia|O": ["ombrellone", "onda", "oceano", "olio solare"],
+  "una verdura|Z": ["zucchina", "zucca", "zenzero"],
+  "un dolce|C": ["crostata", "cannolo", "ciambella", "crema", "cheesecake"],
+  "una bevanda|A": ["acqua", "aranciata", "aperol", "aperitivo"],
+  "un paese|I": ["italia", "india", "irlanda", "islanda", "iran"],
+  "una capitale|L": ["londra", "lisbona", "lubiana", "lima"],
+  "un nome maschile|G": ["giuseppe", "giovanni", "gabriele", "giorgio", "giulio"],
+  "un nome femminile|S": ["sara", "sofia", "silvia", "serena", "simona"],
+  "un cognome|R": ["rossi", "russo", "ricci", "romano", "rizzo"],
+  "una cosa che vola|A": ["aereo", "aquilone", "aliante", "ape", "aquila"],
+  "una cosa che nuota|P": ["pesce", "pinguino", "polpo", "papera"],
+  "una cosa rotonda|M": ["moneta", "melone", "mappamondo", "mandarino"],
+  "una cosa quadrata|D": ["dado", "display", "disegno", "doccia"],
+  "un mezzo di trasporto|T": ["treno", "tram", "taxi", "traghetto", "tir"],
+  "un personaggio famoso|B": ["batman", "barbie", "beyonce", "brad pitt"],
+  "un cantante|V": ["vasco", "venditti", "vanoni", "vivaldi"],
+  "un attore|M": ["mastroianni", "morgan freeman", "matt damon", "monica bellucci"],
+  "un videogioco|F": ["fortnite", "fifa", "fall guys", "final fantasy", "forza horizon"],
+  "un cartone animato|P": ["pokemon", "peppa pig", "pinocchio", "popeye"],
+  "un supereroe|S": ["superman", "spiderman", "shazam", "supergirl"],
+  "un cattivo dei film|J": ["joker", "jafar", "jason", "juggernaut"],
+  "una materia scolastica|S": ["storia", "scienze", "spagnolo", "statistica"],
+  "una cosa nello zaino|Q": ["quaderno", "quadretto"],
+  "una cosa in bagno|A": ["asciugamano", "accappatoio", "armadietto"],
+  "una cosa in camera|L": ["letto", "lampada", "lenzuolo", "libreria"],
+  "una cosa in salotto|T": ["televisione", "tappeto", "tavolino", "tenda"],
+  "una cosa in ufficio|C": ["computer", "calcolatrice", "cassetto", "cancelleria"],
+  "una marca|N": ["nike", "nintendo", "nutella", "netflix", "nissan"],
+  "un'app|I": ["instagram", "imessage", "immuni", "ibis paint"],
+  "un sito web|Y": ["youtube", "yahoo", "yelp"],
+  "una parola tecnologica|R": ["router", "ram", "rete", "robot", "render"],
+  "una cosa rumorosa|M": ["motore", "martello", "moto", "megafono"],
+  "una cosa silenziosa|L": ["libro", "lana", "luce", "libreria"],
+  "una cosa morbida|C": ["cuscino", "cotone", "coperta", "cappotto"],
+  "una cosa dura|P": ["pietra", "piastrella", "pavimento", "porta"],
+  "una cosa piccola|B": ["bottone", "briciola", "batteria", "biglia"],
+  "una cosa gigante|M": ["montagna", "mammut", "mongolfiera", "muro"],
+  "una cosa veloce|F": ["ferrari", "freccia", "fulmine", "falco"],
+  "una cosa lenta|T": ["tartaruga", "trattore", "tramonto"],
+  "una cosa costosa|O": ["orologio", "oro", "opera", "ombrello di lusso"],
+  "una cosa economica|S": ["sale", "sapone", "spugna", "scotch"],
+  "un animale marino|D": ["delfino", "dugongo", "dentice"],
+  "un animale della fattoria|M": ["mucca", "maiale", "montone", "mulo"],
+  "un animale selvatico|L": ["leone", "lupo", "leopardo", "lemure"],
+  "un insetto|F": ["farfalla", "formica", "falena"],
+  "un uccello|A": ["aquila", "airone", "anatra", "allocco"],
+  "un fiore|G": ["girasole", "geranio", "giglio", "gardenia"],
+  "un albero|P": ["pino", "pero", "pioppo", "platano"],
+  "una pianta|C": ["cactus", "camelia", "ciclamino", "coriandolo"],
+  "un elemento naturale|V": ["vento", "vulcano", "valle", "vegetazione"],
+  "una cosa del cielo|N": ["nuvola", "neve", "nube"],
+  "una cosa della montagna|R": ["roccia", "rifugio", "rampone", "ruscello"],
+  "una cosa del mare|S": ["sabbia", "scoglio", "squalo", "salsedine"],
+  "una cosa da campeggio|T": ["tenda", "torcia", "tavolino", "thermos"],
+  "una cosa da palestra|P": ["peso", "panca", "pedana", "palla"],
+  "una cosa da festa|C": ["coriandoli", "candela", "cappellino", "confetti"],
+  "un regalo|B": ["borsa", "bracciale", "biglietto", "bici"],
+  "un giocattolo|M": ["macchinina", "monopoli", "marionetta", "mattoncino"],
+  "uno strumento musicale|C": ["chitarra", "clarinetto", "contrabbasso", "campana"],
+  "un genere musicale|R": ["rock", "rap", "reggae", "rumba"],
+  "una canzone|A": ["azzurro", "albachiara", "amore e capoeira"],
+  "un libro|I": ["inferno", "it", "iliade", "il gattopardo"],
+  "una fiaba|C": ["cenerentola", "cappuccetto rosso", "cenerentola"],
+  "un film Disney|A": ["aladdin", "aristogatti", "avatar", "atlantis"],
+  "una serie TV|S": ["stranger things", "squid game", "sherlock", "scrubs"],
+  "un programma TV|T": ["telegiornale", "tale e quale", "tu si que vales"],
+  "un influencer|K": ["khaby lame", "kendall jenner", "kylie jenner"],
+  "uno youtuber|L": ["luis", "luca campolunghi", "lyon"],
+  "un calciatore|M": ["messi", "mbappe", "maldini", "maradona"],
+  "uno sportivo|R": ["ronaldo", "rossi", "rooney", "rodman"],
+  "una squadra|J": ["juventus", "jazz", "jaguars"],
+  "una parola del calcio|P": ["palla", "porta", "punizione", "parata", "passaggio"],
+  "una parola del basket|T": ["tiro", "tripla", "timeout", "tabellone"],
+  "una parola del tennis|S": ["servizio", "set", "smash", "slice"],
+  "un indumento|G": ["giacca", "gonna", "guanti", "gilet"],
+  "una scarpa|S": ["sneaker", "sandalo", "stivale", "scarponcino"],
+  "un accessorio|C": ["cintura", "cappello", "collana", "cravatta"],
+  "un gioiello|A": ["anello", "ametista", "argento"],
+  "un profumo|D": ["dior", "dolce e gabbana", "davidoff"],
+  "un trucco|M": ["mascara", "matita", "makeup", "mascara waterproof"],
+  "una cosa da mangiare a colazione|C": ["cereali", "cornetto", "cappuccino", "ciambella"],
+  "una cosa da mangiare a pranzo|R": ["risotto", "riso", "ravioli", "roast beef"],
+  "una cosa da mangiare a cena|P": ["pizza", "pasta", "pollo", "pesce"],
+  "uno snack|G": ["grissini", "gelato", "gallette", "gocciole"],
+  "una salsa|M": ["maionese", "mostarda", "marinara", "mayo"],
+  "una spezia|C": ["cannella", "curcuma", "curry", "cumino"],
+  "un gusto di gelato|P": ["pistacchio", "panna", "pesca", "pinolo"],
+  "una pizza|M": ["margherita", "marinara", "messicana", "mortadella"],
+  "un panino|H": ["hamburger", "hot dog"],
+  "un ristorante|S": ["sushi", "steakhouse", "spaghetteria"],
+  "un lavoro creativo|P": ["pittore", "poeta", "pasticcere", "produttore"],
+};
+
 const roundTime = 45000;
 
 const game = {
@@ -194,6 +297,19 @@ function normalize(value) {
 
 function randomPrompt() {
   return prompts[Math.floor(Math.random() * prompts.length)];
+}
+
+function promptKey(prompt) {
+  return `${prompt[0]}|${prompt[1]}`;
+}
+
+function isValidAnswer(answer, prompt) {
+  const cleanAnswer = normalize(answer);
+  if (!cleanAnswer.startsWith(prompt[1].toLowerCase())) return false;
+  const allowed = answerBank[promptKey(prompt)] || [];
+  return allowed.map(normalize).some((word) => {
+    return cleanAnswer === word || cleanAnswer.startsWith(`${word} `);
+  });
 }
 
 function me() {
@@ -355,7 +471,7 @@ function submitAnswerFor(playerId, answer, elapsed) {
   if (net.role !== "host" || game.status !== "playing") return;
   const player = game.players.find((item) => item.id === playerId);
   if (!player || !player.active || player.elapsed !== null) return;
-  if (!normalize(answer).startsWith(game.prompt[1].toLowerCase())) return;
+  if (!isValidAnswer(answer, game.prompt)) return;
   player.answer = String(answer).trim().slice(0, 40);
   player.elapsed = Math.max(0, Number(elapsed) || Date.now() - game.startedAt);
 
@@ -514,9 +630,9 @@ resetGame.addEventListener("click", () => window.location.reload());
 answerForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const answer = answerInput.value.trim();
-  if (!normalize(answer).startsWith(game.prompt[1].toLowerCase())) {
+  if (!isValidAnswer(answer, game.prompt)) {
     answerInput.value = "";
-    answerInput.placeholder = `Deve iniziare con ${game.prompt[1]}`;
+    answerInput.placeholder = `Non vale per "${game.prompt[0]}"`;
     answerInput.focus();
     return;
   }
