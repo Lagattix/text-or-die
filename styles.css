@@ -208,6 +208,18 @@ h2 {
   letter-spacing: 0.12em;
 }
 
+.capacity {
+  display: grid;
+  place-items: center;
+  min-width: 74px;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--muted);
+  font-weight: 1000;
+}
+
 .players,
 .ranking {
   display: grid;

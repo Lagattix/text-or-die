@@ -213,6 +213,7 @@ const game = {
   prompt: null,
   startedAt: 0,
   players: [],
+  maxPlayers: 4,
   results: [],
   eliminatedId: null,
   winnerId: null,
@@ -240,9 +241,11 @@ const joinTab = document.querySelector("#joinTab");
 const createForm = document.querySelector("#createForm");
 const joinForm = document.querySelector("#joinForm");
 const hostName = document.querySelector("#hostName");
+const maxPlayers = document.querySelector("#maxPlayers");
 const joinName = document.querySelector("#joinName");
 const joinCode = document.querySelector("#joinCode");
 const roomCode = document.querySelector("#roomCode");
+const capacityText = document.querySelector("#capacityText");
 const lobbyPlayers = document.querySelector("#lobbyPlayers");
 const roundPlayers = document.querySelector("#roundPlayers");
 const startGame = document.querySelector("#startGame");
@@ -361,6 +364,16 @@ function handleHostConnection(conn) {
   net.conns.set(conn.peer, conn);
   conn.on("data", (message) => {
     if (message.type === "join") {
+      if (game.status !== "lobby") {
+        conn.send({ type: "reject", reason: "La partita e gia iniziata." });
+        conn.close();
+        return;
+      }
+      if (game.players.length >= game.maxPlayers) {
+        conn.send({ type: "reject", reason: "La stanza e piena." });
+        conn.close();
+        return;
+      }
       addPlayer(conn.peer, message.name);
       conn.send({ type: "welcome", playerId: conn.peer });
       broadcast();
@@ -390,10 +403,11 @@ function ensurePeerJs() {
   return true;
 }
 
-function createRoom(name) {
+function createRoom(name, limit) {
   if (!ensurePeerJs()) return;
   const code = makeCode();
   const peerId = roomPeerId(code);
+  const cleanLimit = Math.min(12, Math.max(2, Number(limit) || 4));
 
   setStatus("Creo la stanza...");
   net.role = "host";
@@ -405,6 +419,7 @@ function createRoom(name) {
     game.status = "lobby";
     game.round = 0;
     game.players = [];
+    game.maxPlayers = cleanLimit;
     game.results = [];
     game.eliminatedId = null;
     game.winnerId = null;
@@ -435,6 +450,11 @@ function joinRoom(name, code) {
       net.hostConn.send({ type: "join", name });
     });
     net.hostConn.on("data", (message) => {
+      if (message.type === "reject") {
+        setStatus(message.reason);
+        net.hostConn.close();
+        return;
+      }
       if (message.type === "welcome") net.playerId = message.playerId;
       if (message.type === "state") {
         receiveState(message.game);
@@ -550,6 +570,7 @@ function renderRanking() {
 
 function render() {
   roomCode.textContent = game.code || "-----";
+  capacityText.textContent = `${game.players.length}/${game.maxPlayers}`;
   startGame.classList.toggle("hidden", net.role !== "host");
   startGame.disabled = activePlayers().length < 2;
   nextRound.classList.toggle("hidden", net.role !== "host");
@@ -606,7 +627,7 @@ joinTab.addEventListener("click", () => {
 
 createForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  createRoom(hostName.value);
+  createRoom(hostName.value, maxPlayers.value);
 });
 
 joinForm.addEventListener("submit", (event) => {

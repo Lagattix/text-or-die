@@ -27,10 +27,14 @@
           <button id="joinTab" class="tab" type="button">Unisciti</button>
         </div>
 
-        <form id="createForm" class="grid two">
+        <form id="createForm" class="grid three">
           <label>
             Il tuo nome
             <input id="hostName" maxlength="20" placeholder="Es. Giuseppe" required />
+          </label>
+          <label>
+            Giocatori
+            <input id="maxPlayers" type="number" min="2" max="12" value="4" required />
           </label>
           <button type="submit">Crea codice</button>
         </form>
@@ -53,6 +57,9 @@
           <div>
             <p class="eyebrow">codice stanza</p>
             <button id="roomCode" class="code" type="button" title="Copia codice">-----</button>
+          </div>
+          <div class="capacity">
+            <span id="capacityText">1/4</span>
           </div>
           <button id="startGame" type="button">Inizia</button>
         </div>
