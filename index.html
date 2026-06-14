@@ -9,43 +9,53 @@
   <body>
     <main class="app">
       <header class="hero">
-        <div class="hero__mark">
+        <div class="hero__mark" aria-hidden="true">
           <span>T</span>
           <span>?</span>
           <span>OK</span>
         </div>
         <div>
-          <p class="eyebrow">party game</p>
+          <p class="eyebrow">party game online</p>
           <h1>Text or Die</h1>
-          <p class="subtitle">Una categoria, una lettera, una risposta veloce. Il piu lento viene eliminato.</p>
+          <p class="subtitle">Crea una partita, condividi il codice e fai entrare gli altri giocatori. Il piu lento viene eliminato.</p>
         </div>
       </header>
 
       <section id="setup" class="panel">
-        <div class="grid two">
-          <label>
-            Nome host
-            <input id="hostName" maxlength="20" value="Giuseppe" />
-          </label>
-          <button id="createRoom" type="button">Crea stanza</button>
+        <div class="tabs" role="tablist" aria-label="Modalita">
+          <button id="createTab" class="tab is-active" type="button">Crea partita</button>
+          <button id="joinTab" class="tab" type="button">Unisciti</button>
         </div>
+
+        <form id="createForm" class="grid two">
+          <label>
+            Il tuo nome
+            <input id="hostName" maxlength="20" placeholder="Es. Giuseppe" required />
+          </label>
+          <button type="submit">Crea codice</button>
+        </form>
+
+        <form id="joinForm" class="grid three hidden">
+          <label>
+            Il tuo nome
+            <input id="joinName" maxlength="20" placeholder="Es. Marta" required />
+          </label>
+          <label>
+            Codice
+            <input id="joinCode" maxlength="5" placeholder="ABCDE" required />
+          </label>
+          <button type="submit">Entra</button>
+        </form>
       </section>
 
       <section id="lobby" class="panel hidden">
         <div class="top">
           <div>
             <p class="eyebrow">codice stanza</p>
-            <button id="roomCode" class="code" type="button">-----</button>
+            <button id="roomCode" class="code" type="button" title="Copia codice">-----</button>
           </div>
           <button id="startGame" type="button">Inizia</button>
         </div>
-        <form id="addPlayerForm" class="grid two">
-          <label>
-            Aggiungi giocatore
-            <input id="playerName" maxlength="20" placeholder="Nome" />
-          </label>
-          <button type="submit">Aggiungi</button>
-        </form>
         <div id="lobbyPlayers" class="players"></div>
       </section>
 
@@ -56,10 +66,19 @@
             <h2 id="prompt">un frutto con la B</h2>
           </div>
           <div class="clock">
-            <strong id="clock">0.0s</strong>
+            <strong id="clock">45.0s</strong>
           </div>
         </div>
-        <div id="answerBoard" class="answer-board"></div>
+
+        <form id="answerForm" class="answer">
+          <label>
+            La tua risposta
+            <input id="answerInput" maxlength="40" autocomplete="off" placeholder="Scrivi qui" />
+          </label>
+          <button id="answerButton" type="submit">Invia</button>
+        </form>
+        <p id="hint" class="hint"></p>
+        <div id="roundPlayers" class="players"></div>
       </section>
 
       <section id="results" class="panel hidden">
@@ -78,7 +97,10 @@
         <h2 id="winnerText">Ha vinto!</h2>
         <button id="resetGame" type="button">Nuova partita</button>
       </section>
+
+      <p id="status" class="status" role="status"></p>
     </main>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>
