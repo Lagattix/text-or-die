@@ -3,113 +3,82 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Fuori l'ultimo</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <title>Text or Die</title>
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="app">
-      <section class="hero" aria-label="Fuori l'ultimo">
-        <div class="hero__art" aria-hidden="true">
-          <div class="tile tile--a">B</div>
-          <div class="tile tile--b">?</div>
-          <div class="tile tile--c">OK</div>
-          <div class="pulse"></div>
+      <header class="hero">
+        <div class="hero__mark">
+          <span>T</span>
+          <span>?</span>
+          <span>OK</span>
         </div>
-        <div class="hero__copy">
+        <div>
           <p class="eyebrow">party game</p>
-          <h1>Fuori l'ultimo</h1>
-          <p>Una categoria, una lettera, una risposta veloce. A ogni round il piu lento saluta la partita.</p>
+          <h1>Text or Die</h1>
+          <p class="subtitle">Una categoria, una lettera, una risposta veloce. Il piu lento viene eliminato.</p>
         </div>
-      </section>
+      </header>
 
       <section id="setup" class="panel">
-        <div class="tabs" role="tablist" aria-label="Scegli modalita">
-          <button id="createTab" class="tab is-active" type="button">Crea stanza</button>
-          <button id="joinTab" class="tab" type="button">Entra</button>
+        <div class="grid two">
+          <label>
+            Nome host
+            <input id="hostName" maxlength="20" value="Giuseppe" />
+          </label>
+          <button id="createRoom" type="button">Crea stanza</button>
         </div>
-
-        <form id="createForm" class="form">
-          <label>
-            Nome
-            <input id="createName" autocomplete="nickname" maxlength="20" placeholder="Es. Giuseppe" required />
-          </label>
-          <button type="submit">Crea codice</button>
-        </form>
-
-        <form id="joinForm" class="form hidden">
-          <label>
-            Nome
-            <input id="joinName" autocomplete="nickname" maxlength="20" placeholder="Es. Marta" required />
-          </label>
-          <label>
-            Codice stanza
-            <input id="joinCode" maxlength="5" placeholder="ABCDE" required />
-          </label>
-          <button type="submit">Unisciti</button>
-        </form>
       </section>
 
-      <section id="game" class="game hidden">
-        <header class="topbar">
+      <section id="lobby" class="panel hidden">
+        <div class="top">
           <div>
-            <span class="label">Codice</span>
-            <button id="copyCode" class="room-code" type="button" title="Copia codice">-----</button>
+            <p class="eyebrow">codice stanza</p>
+            <button id="roomCode" class="code" type="button">-----</button>
           </div>
-          <div>
-            <span class="label">Round</span>
-            <strong id="roundLabel">0</strong>
-          </div>
-        </header>
-
-        <section id="lobby" class="panel">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">sala d'attesa</p>
-              <h2>Giocatori pronti</h2>
-            </div>
-            <button id="startButton" type="button">Inizia</button>
-          </div>
-          <div id="playersLobby" class="players"></div>
-        </section>
-
-        <section id="playing" class="panel hidden">
-          <div class="prompt-card">
-            <div class="timer">
-              <span id="timerText">45.0</span>
-              <div class="timer__track"><div id="timerFill" class="timer__fill"></div></div>
-            </div>
-            <p id="promptText" class="prompt">un frutto con la B</p>
-          </div>
-          <form id="answerForm" class="answer-form">
-            <input id="answerInput" autocomplete="off" maxlength="40" placeholder="Scrivi e premi Invio" />
-            <button type="submit">Invia</button>
-          </form>
-          <p id="answerHint" class="hint"></p>
-          <div id="livePlayers" class="players"></div>
-        </section>
-
-        <section id="results" class="panel hidden">
-          <div class="section-head">
-            <div>
-              <p class="eyebrow">classifica</p>
-              <h2>Dal piu lento al piu veloce</h2>
-            </div>
-            <button id="nextButton" type="button">Prossimo round</button>
-          </div>
-          <ol id="ranking" class="ranking"></ol>
-        </section>
-
-        <section id="finished" class="panel hidden">
-          <p class="eyebrow">vittoria</p>
-          <h2 id="winnerText">Ha vinto!</h2>
-          <ol id="finalRanking" class="ranking final-ranking"></ol>
-          <button id="newGame" type="button">Nuova partita</button>
-        </section>
+          <button id="startGame" type="button">Inizia</button>
+        </div>
+        <form id="addPlayerForm" class="grid two">
+          <label>
+            Aggiungi giocatore
+            <input id="playerName" maxlength="20" placeholder="Nome" />
+          </label>
+          <button type="submit">Aggiungi</button>
+        </form>
+        <div id="lobbyPlayers" class="players"></div>
       </section>
 
-      <p id="toast" class="toast hidden" role="status"></p>
+      <section id="round" class="panel hidden">
+        <div class="round-head">
+          <div>
+            <p id="roundNumber" class="eyebrow">round 1</p>
+            <h2 id="prompt">un frutto con la B</h2>
+          </div>
+          <div class="clock">
+            <strong id="clock">0.0s</strong>
+          </div>
+        </div>
+        <div id="answerBoard" class="answer-board"></div>
+      </section>
+
+      <section id="results" class="panel hidden">
+        <div class="top">
+          <div>
+            <p class="eyebrow">classifica</p>
+            <h2>Dal piu lento al piu veloce</h2>
+          </div>
+          <button id="nextRound" type="button">Prossimo round</button>
+        </div>
+        <ol id="ranking" class="ranking"></ol>
+      </section>
+
+      <section id="winner" class="panel hidden">
+        <p class="eyebrow">vittoria</p>
+        <h2 id="winnerText">Ha vinto!</h2>
+        <button id="resetGame" type="button">Nuova partita</button>
+      </section>
     </main>
-
-    <script src="/app.js"></script>
+    <script src="./app.js"></script>
   </body>
 </html>
