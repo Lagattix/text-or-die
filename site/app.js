@@ -9,6 +9,96 @@ const prompts = [
   ["un mestiere", "D"],
   ["qualcosa in cucina", "F"],
   ["una parola da spiaggia", "O"],
+  ["una verdura", "Z"],
+  ["un dolce", "C"],
+  ["una bevanda", "A"],
+  ["un paese", "I"],
+  ["una capitale", "L"],
+  ["un nome maschile", "G"],
+  ["un nome femminile", "S"],
+  ["un cognome", "R"],
+  ["una cosa che vola", "A"],
+  ["una cosa che nuota", "P"],
+  ["una cosa rotonda", "M"],
+  ["una cosa quadrata", "D"],
+  ["un mezzo di trasporto", "T"],
+  ["un personaggio famoso", "B"],
+  ["un cantante", "V"],
+  ["un attore", "M"],
+  ["un videogioco", "F"],
+  ["un cartone animato", "P"],
+  ["un supereroe", "S"],
+  ["un cattivo dei film", "J"],
+  ["una materia scolastica", "S"],
+  ["una cosa nello zaino", "Q"],
+  ["una cosa in bagno", "A"],
+  ["una cosa in camera", "L"],
+  ["una cosa in salotto", "T"],
+  ["una cosa in ufficio", "C"],
+  ["una marca", "N"],
+  ["un'app", "I"],
+  ["un sito web", "Y"],
+  ["una parola tecnologica", "R"],
+  ["una cosa rumorosa", "M"],
+  ["una cosa silenziosa", "L"],
+  ["una cosa morbida", "C"],
+  ["una cosa dura", "P"],
+  ["una cosa piccola", "B"],
+  ["una cosa gigante", "M"],
+  ["una cosa veloce", "F"],
+  ["una cosa lenta", "T"],
+  ["una cosa costosa", "O"],
+  ["una cosa economica", "S"],
+  ["un animale marino", "D"],
+  ["un animale della fattoria", "M"],
+  ["un animale selvatico", "L"],
+  ["un insetto", "F"],
+  ["un uccello", "A"],
+  ["un fiore", "G"],
+  ["un albero", "P"],
+  ["una pianta", "C"],
+  ["un elemento naturale", "V"],
+  ["una cosa del cielo", "N"],
+  ["una cosa della montagna", "R"],
+  ["una cosa del mare", "S"],
+  ["una cosa da campeggio", "T"],
+  ["una cosa da palestra", "P"],
+  ["una cosa da festa", "C"],
+  ["un regalo", "B"],
+  ["un giocattolo", "M"],
+  ["uno strumento musicale", "C"],
+  ["un genere musicale", "R"],
+  ["una canzone", "A"],
+  ["un libro", "I"],
+  ["una fiaba", "C"],
+  ["un film Disney", "A"],
+  ["una serie TV", "S"],
+  ["un programma TV", "T"],
+  ["un influencer", "K"],
+  ["uno youtuber", "L"],
+  ["un calciatore", "M"],
+  ["uno sportivo", "R"],
+  ["una squadra", "J"],
+  ["una parola del calcio", "P"],
+  ["una parola del basket", "T"],
+  ["una parola del tennis", "S"],
+  ["un indumento", "G"],
+  ["una scarpa", "S"],
+  ["un accessorio", "C"],
+  ["un gioiello", "A"],
+  ["un profumo", "D"],
+  ["un trucco", "M"],
+  ["una cosa da mangiare a colazione", "C"],
+  ["una cosa da mangiare a pranzo", "R"],
+  ["una cosa da mangiare a cena", "P"],
+  ["uno snack", "G"],
+  ["una salsa", "M"],
+  ["una spezia", "C"],
+  ["un gusto di gelato", "P"],
+  ["una pizza", "M"],
+  ["un panino", "H"],
+  ["un ristorante", "S"],
+  ["un lavoro creativo", "P"],
 ];
 
 const roundTime = 45000;
@@ -100,6 +190,10 @@ function normalize(value) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
+}
+
+function randomPrompt() {
+  return prompts[Math.floor(Math.random() * prompts.length)];
 }
 
 function me() {
@@ -243,7 +337,7 @@ function startRound() {
   if (net.role !== "host" || activePlayers().length < 2) return;
   game.status = "playing";
   game.round += 1;
-  game.prompt = prompts[(game.round - 1) % prompts.length];
+  game.prompt = randomPrompt();
   game.startedAt = Date.now();
   game.results = [];
   game.eliminatedId = null;
